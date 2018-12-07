@@ -9,6 +9,8 @@ gamecount = 0
 
 data = pickle.load(open('repfile_x_quan_1000.dat', 'rb'))
 
+primary_map = 'Stadium_P'
+
 
 #            0          1       2         3       4         5       6       7        8          9           10              11          12        13        14          15          16                  17                  18          19          20            21           22
 all_cat = ['pos_x', 'pos_y', 'pos_z', 'rot_x', 'rot_y', 'rot_z', 'vel_x', 'vel_y', 'vel_z', 'ang_vel_x', 'ang_vel_y', 'ang_vel_z', 'throttle', 'steer', 'handbrake', 'ball_cam', 'dodge_active', 'double_jump_active', 'jump_active', 'boost', 'boost_active', 'ping', 'boost_collect']
