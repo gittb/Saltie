@@ -27,17 +27,18 @@ class DSgame():
         self.map = map
 
 def createsets(game):
-    inputarray = []
-    deltas = []
-    answerarray = []
+    inputarray = [] #go ahead and allocate full numpy array
+    deltas = [] #go ahead and allocate full numpy array
+    answerarray = [] #go ahead and allocate full numpy array
+
     carmetrics = ['pos_x', 'pos_y', 'pos_z', 'rot_x', 'rot_y', 'rot_z', 'vel_x', 'vel_y', 'vel_z', 'ang_vel_x', 'ang_vel_y', 'ang_vel_z', 'boost', 'boost_active', 'boost_collect']
     ballmetrics = ['pos_x', 'pos_y', 'pos_z', 'rot_x', 'rot_y', 'rot_z', 'vel_x', 'vel_y', 'vel_z', 'ang_vel_x', 'ang_vel_y', 'ang_vel_z']
     #print('in')
 
     for frame in range(1, game['frames'] - 2):
-        xtemp = []
-        ytemp = []
-        dtemp = []
+        xtemp = [] #allocate as well
+        ytemp = []#allocate as well
+        dtemp = []#allocate as wellK
         goal = 0
         try:
             #add player data
