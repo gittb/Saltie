@@ -6,9 +6,12 @@ import pickle
 maps = {}
 gamecount = 0
 
-names = ['repfile_x_quan_1000.dat']
+names = []
+for i in range(10):
+    names.append('repfile_' + str(i) + '_quan_1000.dat')
 
 for datfile in names:
+    data = 0
     data = pickle.load(open(datfile, 'rb'))
 
     for replay in data:
@@ -24,3 +27,14 @@ for datfile in names:
                 maps[map_name] = 1
 
 print(maps)
+
+'''
+most popular map:
+'Stadium_P'
+    'stadium_day_p'
+    'Stadium_Foggy_P'
+    'Stadium_Winter_P'
+    'stadium_foggy_p'
+    'Stadium_p'
+    'stadium_p'
+'''
