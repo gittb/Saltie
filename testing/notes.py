@@ -14,7 +14,4 @@ Map in use:
     'Stadium_p'
     'stadium_p'
 
-
-
-
 '''
