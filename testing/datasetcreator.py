@@ -8,7 +8,7 @@ import time
 datasets = []
 gamecount = 0
 
-data = pickle.load(open('repfile_1_quan_1000.dat', 'rb'))
+data = pickle.load(open('repfile_3_quan_1000.dat', 'rb'))
 
 namelist = ['Stadium_P', 'stadium_day_p', 'Stadium_Foggy_P', 'Stadium_Winter_P', 'stadium_foggy_p', 'Stadium_p', 'stadium_p']
 
@@ -88,7 +88,7 @@ def createsets(game):
             #add ball metrics
             btemp = game['ball'].loc[frame, ballmetrics]
             btemp2 = game['ball'].loc[frame + 1, ballmetrics]
-            dtemp.extend([btemp2[pos] - btemp[pos] for pos in range(12)])
+            #dtemp.extend([btemp2[pos] - btemp[pos] for pos in range(12)])
 
             xtemp.extend(btemp)
             ytemp.extend(btemp2)
@@ -128,15 +128,13 @@ def createsets(game):
 
 def getgame():
     for replay in data:
-        repdat = replay.get_pandas()
-        repproto = replay.get_proto()
 
         try:
             repdat = replay.get_pandas()
             repproto = replay.get_proto()
             #if repproto.game_metadata.team_size != 3 or repproto.game_metadata.map not in namelist:
             if repproto.game_metadata.team_size != 3:
-                print('wrongmap')
+                print('wrongsize')
             elif repproto.game_metadata.map not in namelist:
                 print('wrongmap')
             else:
@@ -223,9 +221,6 @@ def getgame():
                     players[name_niks[demo[1]]]['frame'].hit.iloc[frame - 2] = True
                     #print(players[name_niks[goal[1]]]['frame'].iloc[frame - 2])
 
-
-
-
                 game['players'] = players
 
 
@@ -235,11 +230,11 @@ def getgame():
 
 
 if __name__ == '__main__':
-    p = Pool(processes=2)
+    p = Pool(processes=5)
     datasets = p.map(createsets, getgame())
     p.close()
-
-    write_name = 'set1_' + 'yo '+ '.pset'
+    print(len(datasets))
+    write_name = 'set3_' + 'yo'+ '.pset'
     pickle.dump(datasets, open(write_name, 'wb'), -1)
 
     print('done')
