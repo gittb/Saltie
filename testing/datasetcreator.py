@@ -8,7 +8,7 @@ import time
 datasets = []
 gamecount = 0
 
-data = pickle.load(open('repfile_0_quan_1000.dat', 'rb'))
+data = pickle.load(open('repfile_4_quan_1000.dat', 'rb'))
 
 namelist = ['Stadium_P', 'stadium_day_p', 'Stadium_Foggy_P', 'Stadium_Winter_P', 'stadium_foggy_p', 'Stadium_p', 'stadium_p']
 
@@ -25,7 +25,7 @@ class DSgame():
         self.inputarray = inputarray
         self.deltas = deltas
         self.answerarray = answerarray
-        self.map = map
+        self.map = game_map
 
 def onehotgen(val, cases):
     if val == True:
@@ -129,122 +129,116 @@ def createsets(game):
 
 games = []
 
-def getgame(replay):
+def getgame():
+    for replay in data:
 
-    try:
-        repdat = replay.get_pandas()
-        repproto = replay.get_proto()
-        #if repproto.game_metadata.team_size != 3 or repproto.game_metadata.map not in namelist:
-        if repproto.game_metadata.team_size != 3:
-            print('wrongsize')
-        elif repproto.game_metadata.map not in namelist:
-            print('wrongmap')
-        else:
-            #name handeling shit
-            sortednames = [[x.name, x.id.id, x.is_orange] for x in repproto.players]  # should do dict
-            sortednames.sort(key=lambda x: x[2])
+        try:
+            repdat = replay.get_pandas()
+            repproto = replay.get_proto()
+            #if repproto.game_metadata.team_size != 3 or repproto.game_metadata.map not in namelist:
+            if repproto.game_metadata.team_size != 3:
+                print('wrongsize')
+            elif repproto.game_metadata.map not in namelist:
+                print('wrongmap')
+            else:
+                #name handeling shit
+                sortednames = [[x.name, x.id.id, x.is_orange] for x in repproto.players]  # should do dict
+                sortednames.sort(key=lambda x: x[2])
 
-            names_id = {}
-            names_name = {}
-            name_niks = {}
-            count = 0
-            for i in sortednames:
-                names_id[i[1]] = [i[0], i[2]]
-                names_name[i[0]] = [i[1], i[2]]
-                count += 1
-
-            #all dict creawtion
-
-            game = {}
-            players = {}
-
-            # gamedata
-            game['kickoffs'] = [[x.start_frame_number, x.end_frame_number] for x in repproto.game_stats.kickoffs]
-            game['teamsize'] = repproto.game_metadata.team_size
-            game['frames'] = repproto.game_metadata.frames
-            game['map'] = repproto.game_metadata.map
-            game['ball'] = repdat['ball'][ball_cat]
-            game['misc'] = repdat['game'][game_cat]
-
-
-
-            #get plays atribs
-            count = 1
-
-            #new frames 23 = hit | 24 = demo | 25 = goal | 26 = collision
-
-            for i in names_name:
-                # gen player numpy
-                playerarray = repdat[i][all_cat]
-                playerarray['goal'] = False
-                playerarray['demo'] = False
-                playerarray['hit'] = False
-
-                # name creation
-                if names_name[i][1] == 1:
-                    name = 'orange' + str(count)
-                else:
-                    name = 'blue' + str(count)
-                name_niks[names_name[i][0]] = name
-                # internal dict
-                inner = {
-                    'frame': playerarray,
-                    'name': i,
-                    'team': names_name[i][1],
-                    'id': names_name[i][0]
-                }
-                players[name] = inner
-                if count == 3:
-                    count = 1
-                else:
+                names_id = {}
+                names_name = {}
+                name_niks = {}
+                count = 0
+                for i in sortednames:
+                    names_id[i[1]] = [i[0], i[2]]
+                    names_name[i[0]] = [i[1], i[2]]
                     count += 1
 
-            #additional player vals
-            goalframes = [[x.frame_number, x.player_id.id] for x in repproto.game_metadata.goals]
-            demoframes = [[x.frame_number, x.attacker_id.id] for x in repproto.game_metadata.demos]
-            hits = [[x.frame_number, x.player_id.id] for x in repproto.game_stats.hits]
+                #all dict creawtion
 
-            # new frames 23 = hit | 24 = demo | 25 = goal
-            #print('\n\n goals \n\n')
-            for goal in goalframes:
-                frame = goal[0]
-                players[name_niks[goal[1]]]['frame'].goal.iloc[frame - 2] = True #only god understands this indexing
-                #print(players[name_niks[goal[1]]]['frame'].iloc[frame - 2])
+                game = {}
+                players = {}
 
-            #print('\n\n demos \n\n')
-            for demo in demoframes:
-                frame = demo[0]
-                players[name_niks[demo[1]]]['frame'].demo.iloc[frame-2] = True
-                #print(players[name_niks[goal[1]]]['frame'].iloc[frame - 2])
-
-            #print('\n\n hits \n\n')
-            for hit in hits:
-                frame = hit[0]
-                players[name_niks[demo[1]]]['frame'].hit.iloc[frame - 2] = True
-                #print(players[name_niks[goal[1]]]['frame'].iloc[frame - 2])
-
-            game['players'] = players
+                # gamedata
+                game['kickoffs'] = [[x.start_frame_number, x.end_frame_number] for x in repproto.game_stats.kickoffs]
+                game['teamsize'] = repproto.game_metadata.team_size
+                game['frames'] = repproto.game_metadata.frames
+                game['map'] = repproto.game_metadata.map
+                game['ball'] = repdat['ball'][ball_cat]
+                game['misc'] = repdat['game'][game_cat]
 
 
-            return game
-    except:
-        print('shitsbroke')
+
+                #get plays atribs
+                count = 1
+
+                #new frames 23 = hit | 24 = demo | 25 = goal | 26 = collision
+
+                for i in names_name:
+                    # gen player numpy
+                    playerarray = repdat[i][all_cat]
+                    playerarray['goal'] = False
+                    playerarray['demo'] = False
+                    playerarray['hit'] = False
+
+                    # name creation
+                    if names_name[i][1] == 1:
+                        name = 'orange' + str(count)
+                    else:
+                        name = 'blue' + str(count)
+                    name_niks[names_name[i][0]] = name
+                    # internal dict
+                    inner = {
+                        'frame': playerarray,
+                        'name': i,
+                        'team': names_name[i][1],
+                        'id': names_name[i][0]
+                    }
+                    players[name] = inner
+                    if count == 3:
+                        count = 1
+                    else:
+                        count += 1
+
+                #additional player vals
+                goalframes = [[x.frame_number, x.player_id.id] for x in repproto.game_metadata.goals]
+                demoframes = [[x.frame_number, x.attacker_id.id] for x in repproto.game_metadata.demos]
+                hits = [[x.frame_number, x.player_id.id] for x in repproto.game_stats.hits]
+
+                # new frames 23 = hit | 24 = demo | 25 = goal
+                #print('\n\n goals \n\n')
+                for goal in goalframes:
+                    frame = goal[0]
+                    players[name_niks[goal[1]]]['frame'].goal.iloc[frame - 2] = True #only god understands this indexing
+                    #print(players[name_niks[goal[1]]]['frame'].iloc[frame - 2])
+
+                #print('\n\n demos \n\n')
+                for demo in demoframes:
+                    frame = demo[0]
+                    players[name_niks[demo[1]]]['frame'].demo.iloc[frame-2] = True
+                    #print(players[name_niks[goal[1]]]['frame'].iloc[frame - 2])
+
+                #print('\n\n hits \n\n')
+                for hit in hits:
+                    frame = hit[0]
+                    players[name_niks[demo[1]]]['frame'].hit.iloc[frame - 2] = True
+                    #print(players[name_niks[goal[1]]]['frame'].iloc[frame - 2])
+
+                game['players'] = players
+
+
+                yield game
+        except:
+            print('shitsbroke')
 
 
 if __name__ == '__main__':
-    print("Gathering game data")
-    m = Pool(processes=8)
-    game = m.map(getgame, data)
-    m.close()
-    print('Games collected')
-    print(len(games))
-    print('processing games')
     p = Pool(processes=5)
-    datasets = p.map(createsets, games)
+    datasets = p.map(createsets, getgame())
     p.close()
     print(len(datasets))
     print(datasets[5][1])
-    write_name = 'final_0_' + '.pset'
+    write_name = 'final_4_' + '.pset'
     pickle.dump(datasets, open(write_name, 'wb'), -1)
 
     print('done')
