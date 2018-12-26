@@ -8,7 +8,7 @@ import time
 datasets = []
 gamecount = 0
 
-data = pickle.load(open('repfile_4_quan_1000.dat', 'rb'))
+data = pickle.load(open('repfile_7_quan_1000.dat', 'rb'))
 
 namelist = ['Stadium_P', 'stadium_day_p', 'Stadium_Foggy_P', 'Stadium_Winter_P', 'stadium_foggy_p', 'Stadium_p', 'stadium_p']
 
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     p.close()
     print(len(datasets))
     print(datasets[5][1])
-    write_name = 'final_4_' + '.pset'
+    write_name = 'final_7_' + '.pset'
     pickle.dump(datasets, open(write_name, 'wb'), -1)
 
     print('done')

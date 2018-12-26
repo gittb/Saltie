@@ -14,14 +14,11 @@ class Physicsframe():
             self.players[next["name"]] = player
         self.ballnext = next['ball']
 
-
-
 class Gamedata():
     def __init__ (self, gamearr):
         self.frames = []
         for i in range(len(gamearr)):
             self.frames.append(Physicsframe(gamearr[i][0], gamearr[i][1], gamearr[i][2], gamearr[i][3]))
-
 
 class DataLoader():
     def __init__ (self, data):
