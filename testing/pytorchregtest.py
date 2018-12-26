@@ -11,15 +11,15 @@ import matplotlib.pyplot as plt
 import torch.utils.data as Data
 
 
-numepochs = 5
+numepochs = 15
 
 
 torch.manual_seed(1)    # reproducible
 
-BATCH_SIZE = 512
+BATCH_SIZE = 128
 # BATCH_SIZE = 8
 
-x = torch.tensor(x)      # this is x data (torch tensor)
+x = torch.tensor(x)     # this is x data (torch tensor)
 y = torch.tensor(y)  # this is y data (torch tensor)
 
 torch_dataset = Data.TensorDataset(x, y)
@@ -27,7 +27,7 @@ loader = Data.DataLoader(
     dataset=torch_dataset,      # torch TensorDataset format
     batch_size=BATCH_SIZE,      # mini batch size
     shuffle=True,               # random shuffle for training
-    num_workers=3,              # subprocesses for loading data
+    num_workers=1,              # subprocesses for loading data
     pin_memory=True
 )
 
@@ -55,46 +55,46 @@ class Net(torch.nn.Module):
         self.predict = torch.nn.Linear(n_hidden, n_output)   # output layer
 
     def forward(self, x):
-        x = F.relu(self.hidden(x))      # activation function for hidden layer
+        x = F.tanh(self.hidden(x))      # activation function for hidden layer
         x = self.predict(x)             # linear output
         return x
 
-net = Net(n_feature=177, n_hidden=600, n_output=105)     # define the network
+net = Net(n_feature=177, n_hidden=200, n_output=105)     # define the network
 net.cuda()
 print(net)  # net architecture
 
-optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
+optimizer = torch.optim.RMSprop(net.parameters(), lr=0.001)
 loss_func = torch.nn.MSELoss()  # this is for regression mean squared loss
 
 losses = []
 stamp = []
 plt.ion()   # something about plotting
 
-
 if __name__ == '__main__':
     for epoch in range(numepochs):
+        print(epoch)
+        l=0
 
         for step, (batch_x, batch_y) in enumerate(loader):
             b_x = batch_x.cuda()
             b_y = batch_y.cuda()
+            optimizer.zero_grad()  # clear gradients for next train
 
             prediction = net(b_x)     # input x and predict based on x
-
             loss = loss_func(prediction, b_y)     # must be (1. nn output, 2. target)
 
-            optimizer.zero_grad()   # clear gradients for next train
             loss.backward()         # backpropagation, compute gradients
             optimizer.step()        # apply gradients
-
+            l += loss.item()
             if step % 50 == 0:
-                print(step, loss)
-                losses.append(loss)
+                print(step, l/50)
+                losses.append(l/50)
                 stamp.append(((epoch + 1) * x.shape[0]) + step)
+                l=0
 
 
     plt.cla()
     plt.plot(loss.numpy(), stamp, 'r-', lw=5)
-    plt.text(0.5, 0, 'Loss=%.4f' % loss.data.numpy(), fontdict={'size': 20, 'color':  'red'})
     plt.pause(0.1)
     plt.ioff()
     plt.show()
