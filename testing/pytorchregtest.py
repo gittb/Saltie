@@ -2,8 +2,8 @@ import pickle
 import numpy as np
 import time
 
-x = pickle.load(open('x.dset', 'rb'))
-y = pickle.load(open('y.dset', 'rb'))
+x = pickle.load(open('x2.dset', 'rb'))
+y = pickle.load(open('y2.dset', 'rb'))
 
 import torch
 import torch.nn.functional as F
@@ -56,17 +56,17 @@ class Net(torch.nn.Module):
         self.predict = torch.nn.Linear(n_hidden3, n_output)   # output layer
 
     def forward(self, x):
-        x = F.tanh(self.hidden(x))    # activation function for hidden layer
-        x = F.tanh(self.hidden2(x))
-        x = F.tanh(self.hidden3(x))
+        x = F.relu(self.hidden(x))    # activation function for hidden layer
+        x = F.relu(self.hidden2(x))
+        x = F.relu(self.hidden3(x))
         x = self.predict(x)             # linear output
         return x
 
-net = Net(n_feature=177, n_hidden=3200, n_hidden2=1600, n_hidden3=800, n_output=105)     # define the network
+net = Net(n_feature=177, n_hidden=64, n_hidden2=32, n_hidden3=8, n_output=105)     # define the network
 net.cuda()
 print(net)  # net architecture
 
-optimizer = torch.optim.ASGD(net.parameters(), lr=0.002)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 loss_func = torch.nn.MSELoss()  # this is for regression mean squared loss
 
 losses = []
