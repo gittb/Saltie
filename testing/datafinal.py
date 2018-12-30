@@ -3,7 +3,7 @@ import numpy as np
 import time
 
 '''
-simplying the horrid data structure
+simplying the horrid data structure into X and Y arrays
 '''
 all = []
 total = 0
