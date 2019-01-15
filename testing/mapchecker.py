@@ -29,6 +29,7 @@ for datfile in names:
 print(maps)
 
 '''
+test
 most popular map:
 'Stadium_P'
     'stadium_day_p'
